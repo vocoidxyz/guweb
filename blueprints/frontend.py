@@ -441,7 +441,8 @@ async def register():
     if not glob.config.registration:
         return await flash('error', 'Registrations are currently disabled.', 'home')
 
-    return await render_template('register.html')
+    invite_only = False
+    return await render_template('register.html', invite_only=glob.config.invite_only)
 
 @frontend.route('/register', methods=['POST'])
 async def register_post():
@@ -493,6 +494,15 @@ async def register_post():
 
     if await glob.db.fetch('SELECT 1 FROM users WHERE email = %s', email):
         return await flash('error', 'Email already taken by another user.', 'register')
+
+    # invite code area
+    if glob.config.invite_only:
+        invite_code = form.get('invite_code', type=str)
+        if not regexes.invite_code.match(invite_code):
+            return await flash('error', 'Invalid invite code input.', 'register')
+
+        if not await glob.db.fetch('SELECT 1 FROM invites WHERE invite_code = %s', invite_code):
+            return await flash('error', 'Invalid invite code.', 'register')
 
     # Passwords must:
     # - be within 8-32 characters in length
@@ -550,6 +560,15 @@ async def register_post():
                     8,  # ap!std
                 )]
             )
+
+            # update invites table
+            if glob.config.invite_only:
+                await db_cursor.execute(
+                    'UPDATE invites '
+                    'SET used = TRUE, id = %s'
+                    'WHERE invite_code = %s',
+                    [user_id, invite_code]
+                )
 
     # (end of lock)
 
