@@ -28,7 +28,7 @@
                         </div>
                         <div class="map-date">
                             <time>
-                                <% timeago.format(map.play_time) %>
+                                <% moment(map.play_time + '+00:00').local().fromNow() %>
                             </time>
                         </div>
                     </div>
@@ -353,6 +353,7 @@
 
 {% block bottom %}
 <script src="/static/js/pages/profile.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 {% if user['customisation']['banner'] == True or user['customisation']['background'] == True %}
 <style>
     {% if user['customisation']['banner'] == True %}
