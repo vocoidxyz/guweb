@@ -35,18 +35,18 @@
           </div>
         </div>
         <div class="field">
-          <label for="invite-code" class="label">Invite Code</label>
+          <label for="pass" class="label">Password</label>
           <div class="control has-icons-left">
-            <input id="invite-code" type="password" name="invite_code" placeholder="kin luk shin pow" class="input" maxlength="6" autocomplete="invite-code" required {% if invite_only %}enabled{% endif %}>
+            <input id="pass" type="password" name="password" placeholder="*************" class="input" autocomplete="new-password" required>
             <span class="icon is-small is-left">
               <i class="fa fa-lock"></i>
             </span>
           </div>
         </div>
         <div class="field">
-          <label for="pass" class="label">Password</label>
+          <label for="invite-code" class="label">Invite Code</label>
           <div class="control has-icons-left">
-            <input id="pass" type="password" name="password" placeholder="*************" class="input" autocomplete="new-password" required>
+            <input id="invite-code" type="password" name="invite_code" placeholder="kin luk shin pow" class="input" maxlength="6" autocomplete="invite-code" required {% if invite_only %}enabled{% endif %}>
             <span class="icon is-small is-left">
               <i class="fa fa-lock"></i>
             </span>
