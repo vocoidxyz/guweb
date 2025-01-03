@@ -43,15 +43,17 @@
             </span>
           </div>
         </div>
+        {% if invite_only %}
         <div class="field">
           <label for="invite-code" class="label">Invite Code</label>
           <div class="control has-icons-left">
-            <input id="invite-code" type="password" name="invite_code" placeholder="kin luk shin pow" class="input" maxlength="6" autocomplete="invite-code" required {% if invite_only %}enabled{% endif %}>
+            <input id="invite-code" type="password" name="invite_code" placeholder="kin luk shin pow" class="input" maxlength="6" autocomplete="invite-code" required>
             <span class="icon is-small is-left">
               <i class="fa fa-lock"></i>
             </span>
           </div>
         </div>
+        {% endif %}
         
         <div class="mt-5"></div>
         <div class="dialog">
