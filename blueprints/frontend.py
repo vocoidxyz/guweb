@@ -139,7 +139,7 @@ async def settings_avatar():
 async def settings_avatar_post():
     # constants
     MAX_IMAGE_SIZE = glob.config.max_image_size * 1024 * 1024
-    AVATARS_PATH = f'{glob.config.path_to_gulag}.data/avatars'
+    AVATARS_PATH = f'{glob.config.path_to_gulag}avatars'
     ALLOWED_EXTENSIONS = ['.jpeg', '.jpg', '.png']
 
     avatar = (await request.files).get('avatar')
@@ -164,11 +164,19 @@ async def settings_avatar_post():
             os.remove(f'{AVATARS_PATH}/{session["user_data"]["id"]}{fx}')
 
     # avatar cropping to 1:1
-    pilavatar = Image.open(avatar.stream)
+    try:
+        pilavatar = Image.open(avatar.stream)
+    except:
+        return await flash('error', 'The specified file could not be parsed as an image.', 'settings/avatar')
+
+    pilavatar = utils.crop_image(pilavatar)
 
     # avatar change success
-    pilavatar = utils.crop_image(pilavatar)
-    pilavatar.save(os.path.join(AVATARS_PATH, f'{session["user_data"]["id"]}{file_extension.lower()}'))
+    try:
+        pilavatar.save(os.path.join(AVATARS_PATH, f'{session["user_data"]["id"]}{file_extension.lower()}'))
+    except:
+        return await flash('error', 'The specified file could not be parsed as an image.', 'settings/avatar')
+
     return await flash('success', 'Your avatar has been successfully changed!', 'settings/avatar')
 
 @frontend.route('/settings/custom')
@@ -194,7 +202,7 @@ async def settings_custom_post():
         if not file_extension in ALLOWED_EXTENSIONS:
             return await flash_with_customizations('error', f'The banner you select must be either a .JPG, .JPEG, .PNG or .GIF file!', 'settings/custom')
 
-        banner_file_no_ext = os.path.join(f'.data/banners', f'{session["user_data"]["id"]}')
+        banner_file_no_ext = os.path.join(f'${BANNERS_PATH}', f'{session["user_data"]["id"]}')
 
         # remove old picture
         for ext in ALLOWED_EXTENSIONS:
@@ -209,7 +217,7 @@ async def settings_custom_post():
         if not file_extension in ALLOWED_EXTENSIONS:
             return await flash_with_customizations('error', f'The background you select must be either a .JPG, .JPEG, .PNG or .GIF file!', 'settings/custom')
 
-        background_file_no_ext = os.path.join(f'.data/backgrounds', f'{session["user_data"]["id"]}')
+        background_file_no_ext = os.path.join(f'${BACKGROUND_PATH}', f'{session["user_data"]["id"]}')
 
         # remove old picture
         for ext in ALLOWED_EXTENSIONS:
@@ -619,13 +627,13 @@ async def instagram_redirect():
     return redirect(glob.config.instagram)
 
 # profile customisation
-BANNERS_PATH = Path.cwd() / '.data/banners'
-BACKGROUND_PATH = Path.cwd() / '.data/backgrounds'
+BANNERS_PATH = f'{glob.config.path_to_gulag}banners'
+BACKGROUND_PATH = f'{glob.config.path_to_gulag}backgrounds'
 @frontend.route('/banners/<user_id>')
 async def get_profile_banner(user_id: int):
     # Check if avatar exists
     for ext in ('jpg', 'jpeg', 'png', 'gif'):
-        path = BANNERS_PATH / f'{user_id}.{ext}'
+        path = f'{BANNERS_PATH}/{user_id}.{ext}'
         if path.exists():
             return await send_file(path)
 
@@ -636,7 +644,7 @@ async def get_profile_banner(user_id: int):
 async def get_profile_background(user_id: int):
     # Check if avatar exists
     for ext in ('jpg', 'jpeg', 'png', 'gif'):
-        path = BACKGROUND_PATH / f'{user_id}.{ext}'
+        path = f'{BACKGROUND_PATH}/{user_id}.{ext}'
         if path.exists():
             return await send_file(path)
 
